@@ -1,10 +1,15 @@
-const axios = require('axios');
+import axios from 'axios';
 
-async function getUser(){
-    try{
-        const response = await axios.get('/user?ID=1234')
-        console.log(response)
-    }catch(error){
-        console.log(error)
-    }
-}
+const api = axios.create({
+  baseURL: 'http://localhost:8000',
+});
+
+api.interceptors.request.use((config) => {
+  const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;

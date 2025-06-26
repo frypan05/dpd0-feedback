@@ -7,6 +7,10 @@ from app.models import User
 
 router = APIRouter()
 
+@router.get("/users")
+def get_all_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
+
 @router.get("/me")
 def get_my_profile(current_user: User = Depends(get_current_user)):
     return {

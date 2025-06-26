@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, feedback
+from app.routes import auth
 from app.routes import users
 from app.routes import feedback
 
@@ -21,7 +21,6 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(feedback.router)
 app.include_router(users.router)
-app.include_router(feedback.router)
 
 
 from app.database import Base, engine

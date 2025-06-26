@@ -1,5 +1,5 @@
 "use client"
-
+import api from "@/utils/api";
 import React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -14,15 +14,46 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [role, setRole] = useState("")
 
-  const handleLogin = (e) => {
-    e.preventDefault()
-    
-    if (role === "manager") {
-      window.location.href = "/dashboard/manager"
-    } else if (role === "employee") {
-      window.location.href = "/dashboard/employee"
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  const formData = new URLSearchParams();
+  formData.append("email", email);
+  formData.append("password", password);
+
+  try {
+    const response = await fetch("http://localhost:3000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formData.toString(), // 🔥 super important
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Backend error:", errorData);
+      throw new Error("Login failed");
     }
+
+    const data = await response.json();
+    const { access_token, role } = data;
+
+    localStorage.setItem("token", access_token);
+    localStorage.setItem("role", role);
+
+    // redirect
+    if (role === "manager") {
+      window.location.href = "/dashboard/manager";
+    } else if (role === "employee") {
+      window.location.href = "/dashboard/employee";
+    }
+  } catch (error) {
+    alert("Invalid credentials. Try again.");
+    console.error("Login error:", error);
   }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">

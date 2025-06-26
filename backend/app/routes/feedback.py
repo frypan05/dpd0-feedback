@@ -4,6 +4,7 @@ from app.database import get_db
 from app.auth.dependencies import get_current_user
 from app.models import Feedback, User
 from app.schemas import FeedbackCreate, FeedbackResponse
+from fastapi import Path
 
 router = APIRouter()
 
@@ -32,6 +33,25 @@ def submit_feedback(
     db.refresh(new_feedback)
     return new_feedback
 
+@router.get("/feedback")
+def get_all_feedback(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.role != "manager":
+        raise HTTPException(status_code=403, detail="Only managers can access this.")
+
+    feedbacks = db.query(Feedback).all()
+    return feedbacks
+
+@router.get("/feedback/me", response_model=list[FeedbackResponse])
+def get_my_feedback(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "employee":
+        raise HTTPException(status_code=403, detail="Only employees can view their feedback")
+
+    feedbacks = db.query(Feedback).filter(Feedback.employee_id == current_user.id).all()
+    return feedbacks
+
 @router.get("/feedback/{employee_id}", response_model=list[FeedbackResponse])
 def get_employee_feedbacks(employee_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.role != "manager":
@@ -44,21 +64,26 @@ def get_employee_feedbacks(employee_id: int, db: Session = Depends(get_db), curr
     feedbacks = db.query(Feedback).filter(Feedback.employee_id == employee_id).all()
     return feedbacks
 
-@router.get("/my-feedback", response_model=list[FeedbackResponse])
-def get_my_feedback(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if current_user.role != "employee":
-        raise HTTPException(status_code=403, detail="Only employees can view their feedback")
+@router.post("/feedback/{feedback_id}/acknowledge")
+def acknowledge_feedback(
+    feedback_id: int = Path(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    feedback = db.query(Feedback).filter(
+        Feedback.id == feedback_id,
+        Feedback.employee_id == current_user.id
+    ).first()
 
-    feedbacks = db.query(Feedback).filter(Feedback.employee_id == current_user.id).all()
-    return feedbacks
-
-@router.patch("/acknowledge/{feedback_id}")
-def acknowledge_feedback(feedback_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    feedback = db.query(Feedback).filter(Feedback.id == feedback_id).first()
-
-    if not feedback or feedback.employee_id != current_user.id:
+    if not feedback:
         raise HTTPException(status_code=404, detail="Feedback not found or unauthorized")
+
+    if feedback.is_acknowledged:
+        return {"message": "Already acknowledged"}
 
     feedback.is_acknowledged = True
     db.commit()
-    return {"message": "Feedback acknowledged"}
+
+    return {"message": "Acknowledged successfully"}
+
+
