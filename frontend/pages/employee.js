@@ -1,72 +1,128 @@
-// pages/employee.js
 import { useEffect, useState } from "react";
-import axios from '../utils/api';
+import axios from "../utils/api";
+import Navbar from "@/components/Navbar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Clock, MessageSquare, TrendingUp } from "lucide-react";
 
-export default function EmployeeDashboard() {
+export default function EmployeePage() {
   const [feedbacks, setFeedbacks] = useState([]);
-  const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
     if (!token) return;
-    axios.get("http://localhost:8000/feedback/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then((res) => setFeedbacks(res.data));
+    axios.get("/feedback/me").then((res) => setFeedbacks(res.data));
   }, [token]);
 
   const acknowledgeFeedback = async (id) => {
     try {
-      await axios.patch(`http://localhost:8000/acknowledge/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(`/feedback/${id}/acknowledge`);
       setFeedbacks((prev) =>
         prev.map((f) =>
           f.id === id ? { ...f, is_acknowledged: true } : f
         )
       );
     } catch (err) {
-      alert("Error acknowledging feedback");
+      alert("Failed to acknowledge feedback");
     }
   };
 
+  const getSentimentColor = (sentiment) => {
+    switch (sentiment) {
+      case "positive":
+        return "text-green-600";
+      case "negative":
+        return "text-red-600";
+      default:
+        return "text-yellow-600";
+    }
+  };
+
+  const unacknowledgedCount = feedbacks.filter((f) => !f.is_acknowledged).length;
+  const positiveCount = feedbacks.filter((f) => f.sentiment === "positive").length;
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">👩‍💻 Employee Dashboard</h1>
+    <div className="min-h-screen bg-slate-50">
+      <Navbar field="Employee" unacknowledgedCount={unacknowledgedCount} />
 
-      {feedbacks.length === 0 ? (
-        <div className="text-gray-500 text-center">No feedback received yet.</div>
-      ) : (
-        <div className="grid md:grid-cols-2 gap-6">
+      <div className="p-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Total Feedback</CardTitle>
+              <MessageSquare className="h-4 w-4 text-slate-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{feedbacks.length}</div>
+              <p className="text-xs text-slate-600">Received so far</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Unacknowledged</CardTitle>
+              <Clock className="h-4 w-4 text-slate-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">
+                {unacknowledgedCount}
+              </div>
+              <p className="text-xs text-slate-600">Pending your response</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Positive Feedback</CardTitle>
+              <TrendingUp className="h-4 w-4 text-slate-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {Math.round((positiveCount / feedbacks.length) * 100) || 0}%
+              </div>
+              <p className="text-xs text-slate-600">Positive sentiment</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Feedback cards */}
+        <div className="space-y-6">
           {feedbacks.map((f) => (
-            <div
-              key={f.id}
-              className="bg-white rounded-2xl shadow-md p-6 border hover:shadow-lg transition-all"
-            >
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">📝 Feedback</h2>
-              <p className="text-gray-700 mb-2"><strong>Strengths:</strong> {f.strengths}</p>
-              <p className="text-gray-700 mb-2"><strong>Improvements:</strong> {f.areas_to_improve}</p>
-              <p className="text-gray-700 mb-2"><strong>Sentiment:</strong> {f.sentiment}</p>
-              <p className="text-sm text-gray-400 mt-2">
-                Received on: {new Date(f.timestamp).toLocaleDateString()}
-              </p>
-
-              {!f.is_acknowledged && (
-                <button
-                  onClick={() => acknowledgeFeedback(f.id)}
-                  className="mt-4 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition"
-                >
-                  Acknowledge
-                </button>
-              )}
-
-              {f.is_acknowledged && (
-                <span className="mt-4 inline-block text-sm text-green-600 font-medium">
-                  ✅ Acknowledged
-                </span>
-              )}
-            </div>
+            <Card key={f.id}>
+              <CardHeader>
+                <CardTitle className={getSentimentColor(f.sentiment)}>
+                  {f.sentiment.charAt(0).toUpperCase() + f.sentiment.slice(1)}
+                </CardTitle>
+                <CardDescription>
+                  Received on {new Date(f.timestamp).toLocaleDateString()}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p>
+                  <strong>Strengths:</strong> {f.strengths}
+                </p>
+                <p>
+                  <strong>Improvements:</strong> {f.areas_to_improve}
+                </p>
+                {!f.is_acknowledged ? (
+                  <button
+                    onClick={() => acknowledgeFeedback(f.id)}
+                    className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                  >
+                    Acknowledge
+                  </button>
+                ) : (
+                  <span className="text-green-600 font-medium">✅ Acknowledged</span>
+                )}
+              </CardContent>
+            </Card>
           ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+# app/create_user.py
+
 from app.database import SessionLocal
 from app.models import User
 from app.auth.security import hash_password

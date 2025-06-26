@@ -1,3 +1,5 @@
+//pages/login.js
+
 "use client"
 import api from "@/utils/api";
 import React from "react"
@@ -17,40 +19,26 @@ export default function LoginPage() {
 const handleLogin = async (e) => {
   e.preventDefault();
 
-  const formData = new URLSearchParams();
-  formData.append("email", email);
-  formData.append("password", password);
-
   try {
-    const response = await fetch("http://localhost:3000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: formData.toString(), // 🔥 super important
+    const response = await api.post("/login", {
+      email,
+      password,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Backend error:", errorData);
-      throw new Error("Login failed");
-    }
-
-    const data = await response.json();
-    const { access_token, role } = data;
+    const { access_token, role } = response.data;
 
     localStorage.setItem("token", access_token);
     localStorage.setItem("role", role);
 
-    // redirect
+    // Redirect based on role
     if (role === "manager") {
-      window.location.href = "/dashboard/manager";
+      window.location.href = "/manager";
     } else if (role === "employee") {
-      window.location.href = "/dashboard/employee";
+      window.location.href = "/employee";
     }
   } catch (error) {
     alert("Invalid credentials. Try again.");
-    console.error("Login error:", error);
+    console.error("Login error:", error?.response?.data || error.message);
   }
 };
 
