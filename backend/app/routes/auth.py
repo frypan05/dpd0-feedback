@@ -24,3 +24,4 @@ def login(data: dict, db: Session = Depends(get_db)):
     
     token = create_access_token({"id": user.id, "role": user.role})
     return { "access_token": token, "role": user.role }
+
