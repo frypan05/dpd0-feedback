@@ -9,7 +9,6 @@ from app.routes import feedback
 app = FastAPI()
 
 # CORS for frontend
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
