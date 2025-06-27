@@ -118,7 +118,7 @@ export default function EmployeeDashboard() {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Feedback Timeline</CardTitle>
-                                <CardDescription>All feedback you've received from your manager</CardDescription>
+                                <CardDescription>All feedback you&apos;ve received from your manager</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-6">

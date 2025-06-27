@@ -108,7 +108,7 @@ export default function ManagerPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Past Feedback</CardTitle>
-                <CardDescription>See feedback you've already submitted</CardDescription>
+                <CardDescription>See feedback you&apos;ve already submitted</CardDescription>
               </CardHeader>
               <CardContent>
                 <FeedbackList feedbacks={feedbacks} />
