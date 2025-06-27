@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CheckCircle, Clock, MessageSquare, TrendingUp } from "lucide-react"
 import Navbar from "@/components/Navbar"
+import { FeedbackCard } from "@/dashboard/employee"
 
 const feedbackHistory = [
     {
