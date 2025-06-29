@@ -2,11 +2,14 @@
 FROM python:3.11-slim
 
 # Upgrade system packages and install build dependencies
-RUN apt-get update && \
-	apt-get upgrade -y && \
-	apt-get install -y --no-install-recommends build-essential gcc && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libglib2.0-dev \
+    pkg-config \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set workdir
 WORKDIR /app
