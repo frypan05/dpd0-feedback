@@ -1,5 +1,5 @@
 # Use Python 3.11 base image
-FROM python:3.11-slim-bullseye
+FROM python:3.11-slim
 
 # Upgrade system packages and install build dependencies
 RUN apt-get update && \
