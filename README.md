@@ -3,7 +3,9 @@
 
 A lightweight and secure feedback tool designed for internal communication between managers and employees. It facilitates structured feedback, team visibility, and a clean dashboard view.
 
-![Feedback UI Screenshot](https://your-screenshot-link-if-any.com)
+## [Feedback UI Screenshot]
+![alt text](image.png)
+![alt text](image-1.png)
 
 ## 🌟 Features
 
