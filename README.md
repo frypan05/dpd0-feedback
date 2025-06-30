@@ -92,16 +92,4 @@ docker run -p 8000:8000 feedback-backend
 ```
 
 ## Project Structure
-├── backend
-│   ├── app
-│   │   ├── main.py          # FastAPI app entry
-│   │   ├── models.py        # Pydantic models & DB models
-│   │   ├── routes           # Routes for auth, feedback
-│   │   └── db.py            # DB connection
-│   └── Dockerfile
-│
-├── frontend
-│   ├── pages/login.js       # Login Page
-│   ├── pages/manager.js     # Manager Dashboard
-│   ├── pages/employee.js    # Employee Dashboard
-│   └── utils/api.js         # Axios instance with baseURL
+![alt text](image-2.png)
