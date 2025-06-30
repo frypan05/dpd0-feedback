@@ -14,7 +14,7 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# 🔥 THIS is the Base you're importing
+# Base class for declarative models
 Base = declarative_base()
 
 def get_db():

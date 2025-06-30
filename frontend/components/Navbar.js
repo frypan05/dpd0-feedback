@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge"
 
 function formatEmailName(email) {
   if (!email) return "User";
-  const namePart = email.split("@")[0]; // daksh.sharma
+  const namePart = email.split("@")[0];
   return namePart
-    .split(/[._]/) // split on dot or underscore
+    .split(/[._]/)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
