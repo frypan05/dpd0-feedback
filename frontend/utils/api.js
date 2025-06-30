@@ -2,8 +2,13 @@
 
 import axios from 'axios';
 
+const baseURL =
+  typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? "http://localhost:8000"
+    : "https://dpd0-feedback.onrender.com"; // Production backend URL
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL,
 });
 
 api.interceptors.request.use((config) => {
